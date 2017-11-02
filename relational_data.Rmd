@@ -1,0 +1,12 @@
+---
+title: "relational_data"
+author: "ashley"
+date: "November 2, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
