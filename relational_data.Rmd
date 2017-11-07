@@ -7,6 +7,98 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(nycflights13)
+library(Lahman)
+library(babynames)
+library(nasaweather)
+library(fueleconomy)
+library(ggplot2)
+library(maps)
 ```
 
+#13.2.1
+1. In flights you will need the origin and dest, in the airports you will need lat and long. We would have to combine the flights table to the airports table for both the origin and destination so that you get the lat and long of both. 
+2. The relationship between weather and airports is that origin and faa is the same thing.
+3. The same variables would match together. So year, month, day, hour, and origin would match. 
+4. Add a table in flights that show the special ones with the day year and month so that it symbolizes the day of special flights. 
+
+```{r flights}
+airports
+airlines
+planes
+flights
+weather
+```
+
+#13.3.1
+1.
+```{r flights_key}
+flights %>% 
+  count(year, month, day, tailnum) %>% 
+  filter(n > 1)
+```
+
+2.batting: playerId, yearId,and stint
+  babynames: year, sex, name
+  atmos:lat, long, year, month
+  vehicles: id
+  diamonds:there is not a primary key
+```{r keys}
+Lahman::Batting%>%
+  group_by(playerID, yearID, stint)
+
+babynames::babynames%>%
+  group_by(year, sex, name) 
+
+nasaweather::atmos%>%
+  group_by(lat, long, year, month)
+
+fueleconomy::vehicles%>%
+  group_by(id)
+
+diamonds
+```
+
+3.
+
+#13.4.6
+1.
+```{r map}
+airports %>%
+  semi_join(flights, c("faa" = "dest")) %>%
+  ggplot(aes(lon, lat)) +
+    borders("state") +
+    geom_point(aes(color = dst)) +
+    coord_quickmap()
+```
+
+2.
+```{r combine}
+flights%>%
+  inner_join(airports, c("origin" = "faa"))%>%
+  select(flight, origin, dest, lat, lon)
+```
+3. There is not an obvious relationship
+```{r age}
+flights%>%
+    inner_join(airports, c("origin" = "faa"))%>%
+  select(dep_delay, arr_delay, year)
+```
+4.
+```{r weather}
+flights%>%
+    inner_join(nasaweather::atmos)%>%
+  select(precip)
+```
+5.
+
+
+#13.5.1
+1.
+2.
+3.
+4.
+5.
+6.
 
