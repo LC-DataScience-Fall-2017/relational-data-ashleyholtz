@@ -85,20 +85,67 @@ flights%>%
     inner_join(airports, c("origin" = "faa"))%>%
   select(dep_delay, arr_delay, year)
 ```
-4.
+4. wind and visibility make differences in the flight delay time
 ```{r weather}
+#atmos
+#flights
 flights%>%
-    inner_join(nasaweather::atmos)%>%
-  select(precip)
+  inner_join(weather)%>%
+  select(dep_delay, wind_speed, precip, pressure,visib)%>%
+  arrange(dep_delay)
 ```
-5.
+5.Google shows there were two tornados that delayed the flights. the data show there is high wind speeds and a lot of pressure- inferring rough weather causing delays.
+```{r delays}
+flights%>%
+  inner_join(weather, c("year", "month" , "day" , "hour" , "origin"))%>%
+  select(day,month, year, dep_delay, wind_speed, precip, pressure, visib)%>%
+  filter(month==6)
+```
 
 
 #13.5.1
-1.
+1. Airlines MQ and AA have by far the most flights are without a tailnum. The airlines are not matched with a tailnum. 
+```{r no_tailnum}
+flights %>%
+  anti_join(planes, by = "tailnum") %>%
+  count(carrier, sort = TRUE)
+```
 2.
+```{r count}
+planes%>%  
+  inner_join(flights)%>%
+  group_by(tailnum)%>%
+  count()%>%
+  filter(n>100)
+```
 3.
-4.
-5.
-6.
+```{r vehicles}
+fueleconomy::vehicles%>%
+  semi_join(fueleconomy::common, c("make", "model"))
+```
+4. Most of the delayed flights are during the months of decemeber and november. So the winter weather has an effect on the flights being delayed. 
+```{r 4}
+flights%>%
+  inner_join(weather)%>%
+  group_by(day,month,year)%>%
+  select(dep_delay)%>%
+  count()%>%
+  arrange(desc(n))
+```
+
+5. the first one looks at the flights with the destination that does not match with an origin. and the second one looks at the flights that does has an arrival but does not have a match with the destination or the flights that does not have a destination in the data. 
+```{r 1}
+anti_join(flights, airports, by = c("dest" = "faa"))
+```
+```{r 2}
+anti_join(airports, flights, by = c("faa" = "dest"))
+```
+6. It makes sence that they have a relationship because the airlines control where the planes go and so they will have the data of those planes and flights. 
+```{r 6}
+flights%>%
+  group_by(tailnum, carrier)%>%
+  count()%>%
+  filter(n()>1)%>%
+  select(tailnum)
+```
 
